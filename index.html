@@ -170,12 +170,12 @@
 </div>
 
 <script>
-    // Initial Pre-configured Indian News Channels (Default Seed Data)
+ // Initial Pre-configured Indian News Channels (Default Seed Data)
     const defaultChannels = [
         {
             name: "NDTV 24x7",
             lang: "english",
-            embedId: "_6vCsgS2gQ0", // Replace with valid live ID dynamically if needed
+            embedId: "_6vCsgS2gQ0", 
             shorts: "https://youtube.com"
         },
         {
@@ -187,36 +187,24 @@
         {
             name: "Polimer News",
             lang: "tamil",
-            embedId: "K1234567890", // Example placeholder
+            embedId: "jWvH_cR-pW0", 
             shorts: "https://youtube.com"
         },
         {
             name: "Thanthi TV",
             lang: "tamil",
-            embedId: "T1234567890", // Example placeholder
+            embedId: "U3S9g76b5b0", 
             shorts: "https://youtube.com"
         }
     ];
 
     let currentLanguage = 'english';
 
-    // Helper to get video ID or embed structure from mixed string inputs
-    function cleanEmbedId(input) {
-        if(input.includes('embed/')) {
-            return input.split('embed/')[1].split('?')[0];
-        } else if(input.includes('watch?v=')) {
-            return input.split('watch?v=')[1].split('&')[0];
-        }
-        return input;
-    }
-
-    // Load Channels from localStorage or defaults
     function getChannels() {
         const local = localStorage.getItem('custom_news_channels');
         return local ? JSON.parse(local) : defaultChannels;
     }
 
-    // Render the layout based on chosen tab
     function renderGrid() {
         const grid = document.getElementById('news-grid');
         grid.innerHTML = '';
@@ -225,18 +213,21 @@
         const filtered = channels.filter(c => c.lang === currentLanguage);
 
         filtered.forEach(c => {
-            const cleanId = cleanEmbedId(c.embedId);
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = `
-                <div class="video-container">
-                    <iframe src="https://youtube.com{cleanId}" allowfullscreen></iframe>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">${c.name}</h3>
-                    <a href="${c.shorts}" target="_blank" class="btn-link">📺 View Shorts</a>
-                </div>
-            `;
+            
+            // Safe URL construction without string literal errors
+            const embedUrl = "https://youtube.com" + c.embedId;
+            
+            card.innerHTML = 
+                '<div class="video-container">' +
+                    '<iframe src="' + embedUrl + '" allowfullscreen></iframe>' +
+                '</div>' +
+                '<div class="card-content">' +
+                    '<h3 class="card-title">' + c.name + '</h3>' +
+                    '<a href="' + c.shorts + '" target="_blank" class="btn-link">📺 View Shorts</a>' +
+                '</div>';
+            
             grid.appendChild(card);
         });
     }
@@ -244,7 +235,9 @@
     function switchLanguage(lang) {
         currentLanguage = lang;
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        if (event && event.target) {
+            event.target.classList.add('active');
+        }
         renderGrid();
     }
 
@@ -262,7 +255,7 @@
         localStorage.setItem('custom_news_channels', JSON.stringify(allChannels));
         document.getElementById('channelForm').reset();
         renderGrid();
-        alert('Channel added successfully to local storage configuration!');
+        alert('Channel added successfully!');
     }
 
     function scrollToAdmin() {
